@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stb_image.h>
 
 #include "ArgumentParser.h"
 #include "Mode.h"
