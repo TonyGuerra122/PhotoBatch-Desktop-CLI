@@ -5,6 +5,7 @@
 #include <iostream>
 #include <array>
 #include <filesystem>
+#include <chrono>
 
 using namespace std;
 
@@ -26,8 +27,17 @@ const std::string& Mode::GetFolder() const{
 
 void Mode::Run() {
 
-	// No futuro vamos medir quanto tempo a operação levou
+	using ClockT = chrono::high_resolution_clock;
+
+	// Ler o tempo de execução neste ponto
+	ClockT::time_point startTime = ClockT::now();
 	RunImpl();
+	ClockT::time_point endTime = ClockT::now();
+
+	ClockT::duration elapsedTime = endTime - startTime;
+	auto elapsedTimeMs = chrono::duration_cast<chrono::milliseconds>(elapsedTime);
+
+	cout << GetModeName() << "Operação finalizada em " << elapsedTimeMs.count() << "ms" << endl;
 }
 
 
