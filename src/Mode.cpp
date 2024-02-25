@@ -1,6 +1,8 @@
 #include "Mode.h"
 #include "ArgumentParser.h"
 #include "RenameMode.h"
+#include "ConvertMode.h"
+#include "StringUtils.h"
 
 #include <iostream>
 #include <array>
@@ -40,6 +42,26 @@ void Mode::Run() {
 	cout << GetModeName() << "Operação finalizada em " << elapsedTimeMs.count() << "ms" << endl;
 }
 
+vector<filesystem::path> Mode::GetFiles(const filesystem::path& extension) const {
+	std::vector<std::filesystem::path> files;
+	int numSkippedFiles = 0;
+
+	// Coletar todos os arquvos que correspondem ao filtro especificado
+	for (const auto& entry : std::filesystem::directory_iterator(GetFolder())) {
+
+		const auto bIsFile = std::filesystem::is_regular_file(entry.path());
+		const auto bMatchFilter = GetFilter().empty() || (StringUtils::ToLower(entry.path().string()).find(GetFilter()) != std::string::npos);
+		const auto bMatchExtension = extension.empty() || (entry.path().extension() == extension);
+
+		if (bIsFile && bMatchFilter) files.push_back(entry.path());
+		else numSkippedFiles++;
+	}
+
+	std::cout << GetModeName() << "Número de arquivos encontrados: " << files.size() << std::endl;
+	std::cout << GetModeName() << "Número de arquivos ignorados: " << numSkippedFiles << std::endl;
+
+	return files;
+}
 
 static void PrintHelpMode() {
 	system("cls");
@@ -168,7 +190,7 @@ std::unique_ptr<Mode> CreateMode(const ArgumentParser& argParser) {
 	if (bConvertMode) {
 		const auto from = argParser.GetOptionAs<string>(Args::Options::From);
 		const auto to = argParser.GetOptionAs<string>(Args::Options::To);
-		const array<string, 2> convertOptions = { ".jpg", ".png" };
+		const array<string, 2> convertOptions = { "jpg", "png" };
 
 		const auto bIsFromValid = find(begin(convertOptions), end(convertOptions), from) != end(convertOptions);
 		const auto bIsToValid = find(begin(convertOptions), end(convertOptions), to) != end(convertOptions);
@@ -178,6 +200,13 @@ std::unique_ptr<Mode> CreateMode(const ArgumentParser& argParser) {
 		if (!bIsFromValid || !bIsToValid) throw invalid_argument("From e To devem ser jpg ou png");
 
 		if (from == to) throw invalid_argument("From e To devem ser diferentes");
+
+		const map<string, ConvertMode::Format> convertOptionsMap = {
+			{ "jpg", ConvertMode::Format::JPG },
+			{ "png", ConvertMode::Format::PNG }
+		};
+
+		return make_unique<ConvertMode>(filter, folder, convertOptionsMap.at(from), convertOptionsMap.at(to));
 	}
 
 

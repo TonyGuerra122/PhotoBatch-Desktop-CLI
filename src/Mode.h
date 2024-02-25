@@ -2,6 +2,8 @@
 
 #include <string>
 #include <memory>
+#include <filesystem>
+#include <vector>
 
 class Mode {
 public:
@@ -17,6 +19,8 @@ public:
 
 protected:
 	virtual void RunImpl() = 0;
+
+	std::vector<std::filesystem::path> GetFiles(const std::filesystem::path& extension = "") const;
 
 private:
 	std::string m_Folder;
