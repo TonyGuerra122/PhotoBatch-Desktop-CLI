@@ -7,12 +7,16 @@
 
 using namespace std;
 
+static constexpr const char* VERSION = "1.0";
+
 namespace Args {
 	namespace Flags {
 		static constexpr const char* Rename = "rename";
 		static constexpr const char* Convert = "convert";
 		static constexpr const char* Resize = "resize";
 		static constexpr const char* Scale = "scale";
+		static constexpr const char* Help = "help";
+		static constexpr const char* Version = "version";
 	}
 	namespace Options {
 		static constexpr const char* Folder = "folder";
@@ -25,6 +29,28 @@ namespace Args {
 		static constexpr const char* From = "from";
 		static constexpr const char* To = "to";
 	}
+}
+
+static void PrintHelpMode() {
+	system("cls");
+
+	const auto printSpcmArg = [](const string arg1, const string arg2) -> void {
+		cout << "	" << flush;
+		cout << arg1 << "      " << arg2 << endl;
+		};
+
+	cout << "Comandos: " << endl;
+	printSpcmArg("PhotoBatch --help", "Mostra todos os comandos do PhotoBatch");
+	printSpcmArg("PhotoBatch --rename", "Renomeia o arquivo");
+	printSpcmArg("PhotoBatch --convert", "Convete o arquivo para as extensões possíveis (png, jpg), utilize --From= e --To=");
+	printSpcmArg("PhotoBatch --resize", "Redimensiona o tamanho da imagem, utilize --Width= e --Height=");
+	printSpcmArg("PhotoBatch --scale", "Aumenta ou diminui a escala da imagem, utilize --Amount=");
+}
+
+static void PrintVersionMode() {
+	system("cls");
+
+	cout << "PhotoBatch Version: " << VERSION << endl;
 }
 
 static const string& GetInvalidChars() {
@@ -40,12 +66,14 @@ static void ValidateArguments(const ArgumentParser& argParser) {
 
 	// Ler as flags que o ArgumentParser identificou
 
-	const bool bRenameMode = argParser.GetFlag(Args::Flags::Rename);
-	const bool bConvertMode = argParser.GetFlag(Args::Flags::Convert);
-	const bool bResizeMode = argParser.GetFlag(Args::Flags::Resize);
-	const bool bScaleMode = argParser.GetFlag(Args::Flags::Scale);
+	const auto bRenameMode = argParser.GetFlag(Args::Flags::Rename);
+	const auto bConvertMode = argParser.GetFlag(Args::Flags::Convert);
+	const auto bResizeMode = argParser.GetFlag(Args::Flags::Resize);
+	const auto bScaleMode = argParser.GetFlag(Args::Flags::Scale);
+	const auto bHelpMode = argParser.GetFlag(Args::Flags::Help);
+	const auto bVersionMode = argParser.GetFlag(Args::Flags::Version);
 
-	const array<bool, 4> modes = { bRenameMode, bConvertMode, bResizeMode, bScaleMode };
+	const array<bool, 6> modes = { bRenameMode, bConvertMode, bResizeMode, bScaleMode, bHelpMode, bVersionMode };
 	const ptrdiff_t numActiveModes = count(begin(modes), end(modes), true);
 
 	// Verificar se somente um modo do PhotoBatch está ativo
@@ -138,6 +166,12 @@ static void ValidateArguments(const ArgumentParser& argParser) {
 
 		if (from == to) throw invalid_argument("From e To devem ser diferentes");
 	}
+
+	// Criação do modo Help
+	if (bHelpMode) PrintHelpMode();
+
+	// Criação do modo Version
+	if (bVersionMode) PrintVersionMode();
 }
 
 int main(int argc, char* argv[]) {
@@ -151,6 +185,8 @@ int main(int argc, char* argv[]) {
 	argParser.RegisterFlag(Args::Flags::Convert);
 	argParser.RegisterFlag(Args::Flags::Resize);
 	argParser.RegisterFlag(Args::Flags::Scale);
+	argParser.RegisterFlag(Args::Flags::Help);
+	argParser.RegisterFlag(Args::Flags::Version);
 
 	// Registra as opções do programa
 	argParser.RegisterOption(Args::Options::Folder);
