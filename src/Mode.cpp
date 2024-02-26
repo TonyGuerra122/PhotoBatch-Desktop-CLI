@@ -3,6 +3,7 @@
 #include "RenameMode.h"
 #include "ConvertMode.h"
 #include "StringUtils.h"
+#include "ResizeMode.h"
 
 #include <iostream>
 #include <array>
@@ -145,6 +146,8 @@ std::unique_ptr<Mode> CreateMode(const ArgumentParser& argParser) {
 		if (width <= 0 || height <= 0) throw invalid_argument("Width e Height devem ser maiores que zero");
 
 		if (filter.empty()) throw invalid_argument("Filter não pode estar em branco no modo resize");
+
+		return make_unique<ResizeMode>(filter, folder, width, height);
 	}
 
 	// Validar o modo scale
