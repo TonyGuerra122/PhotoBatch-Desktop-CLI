@@ -2,7 +2,7 @@
 
 #include "Mode.h"
 
-class ResizeMode final : public Mode {
+class ResizeMode : public Mode {
 public:
 	ResizeMode(const std::string& filter,
 		const std::string& folder,

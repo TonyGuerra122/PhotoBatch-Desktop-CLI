@@ -4,6 +4,7 @@
 #include "ConvertMode.h"
 #include "StringUtils.h"
 #include "ResizeMode.h"
+#include "ScaleMode.h"
 
 #include <iostream>
 #include <array>
@@ -166,6 +167,7 @@ std::unique_ptr<Mode> CreateMode(const ArgumentParser& argParser) {
 		if (amount <= 0.0f) throw invalid_argument("Amount deve ser maior do que zero");
 		if (filter.empty()) throw invalid_argument("Filter não pode estar em branco no modo scale");
 
+		return make_unique<ScaleMode>(filter, folder, amount);
 	}
 
 	// Validar o modo Rename
