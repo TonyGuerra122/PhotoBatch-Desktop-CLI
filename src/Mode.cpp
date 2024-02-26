@@ -120,9 +120,10 @@ std::unique_ptr<Mode> CreateMode(const ArgumentParser& argParser) {
 
 	// Validar a pasta passada como a opção folder
 	const auto folder = argParser.GetOptionAs<string>(Args::Options::Folder);
-	if (folder.empty()) throw invalid_argument("A pasta não pode estar em branco");
 
-	if (!filesystem::exists(folder)) throw invalid_argument("A pasta não existe");
+	if (!bHelpMode && !bVersionMode && folder.empty()) throw invalid_argument("A pasta não pode estar em branco");
+
+	if (!bHelpMode && !bVersionMode && !filesystem::exists(folder)) throw invalid_argument("A pasta não existe");
 
 	// Validar se o filtro é uma string válida
 
